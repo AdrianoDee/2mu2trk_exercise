@@ -22,7 +22,7 @@ voms-proxy-init -rfc -voms cms -valid 192:00
 
 Then simply run the config
 ```
-cmsRun MuMuTrkTrk/MuMuTrkTrk/test/cmsRun run-jpsikk-miniaodsim.py
+cmsRun MuMuTrkTrk/MuMuTrkTrk/test/run-jpsikk-miniaodsim.py
 ```
 
 ----
@@ -73,7 +73,7 @@ triggers = [
 'HLT_DoubleMu4_JpsiTrkTrk_Displaced', ##Run3 trigger!
 ]
 ```
-this is a trigger dedicated to $J/\psi\;\;+\;\;2\,Track$ displaced topologies (exactly what we need!). The $4$ there is the $p_T$ threshold on the $2\mu$ system. So we add to the process a module to filter the events:
+this is a trigger dedicated to $J/\psi + 2 Tracks$ displaced topologies (exactly what we need!). The $4$ there is the $p_T$ threshold on the $2\mu$ system. So we add to the process a module to filter the events:
 
 ```
 hltpathsV = cms.vstring([h + '_v*' for h in triggers ])
