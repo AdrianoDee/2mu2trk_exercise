@@ -41,8 +41,8 @@ We can sketch the decay topology as follows:
 
 ![BsJpsiPhi](images/bs_jps_phi.png "BsJpsiPhi")
 
-the $B_s^0$ candidate, before decaying, flies (give the non negligible lifetime) w.r.t the collision area (beam spot) and it decays in:
-- $J/psi$ meson, a $c\bar{c}$ bound state with a mass of $\sim 3096 MeV$(see the [PDG](https://pdg.lbl.gov/2023/web/viewer.html?file=../tables/rpp2023-tab-mesons-c-cbar.pdf) for further details) 
+the $B_s^0$ candidate, before decaying, flies (given the non negligible lifetime) w.r.t the collision area (beam spot) and it decays in:
+- $J/\psi$ meson, a $c\bar{c}$ bound state with a mass of $\sim 3096 MeV$(see the [PDG](https://pdg.lbl.gov/2023/web/viewer.html?file=../tables/rpp2023-tab-mesons-c-cbar.pdf) for further details) 
 - $\phi$ meson ($s\bar{s}$) a mass of $\sim 1020 MeV$(see the [PDG](https://pdg.lbl.gov/2023/tables/contents_tables_mesons.html ) for further details).
 
 The $J/psi$ and the $\phi$ then furhterly decay into a pair of opposite sign muons and a pair of opposite sign kaons, almost promptly w.r.t. the $B^0_s$ meson.
