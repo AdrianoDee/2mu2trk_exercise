@@ -112,18 +112,40 @@ In this case, e.g., we are selecting muons:
 Now it's the moment to build the µµ candidate:
 
 ```python
+### µµ building
 process.load("MuMuTrkTrk.MuMuTrkTrk.onia2MuMuPAT_cfi")
+process.onia2MuMuPAT.muons=cms.InputTag('oniaSelectedMuons') #using as input the selected muons
+process.onia2MuMuPAT.primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices') #the PVs
+process.onia2MuMuPAT.beamSpotTag=cms.InputTag('offlineBeamSpot') #the Bs
+process.onia2MuMuPAT.higherPuritySelection=cms.string("") 
+process.onia2MuMuPAT.lowerPuritySelection=cms.string("")
+process.onia2MuMuPAT.dimuonSelection=cms.string("2.5 < mass && mass < 3.5") #mass window cuts
+process.onia2MuMuPAT.addMCTruth = cms.bool(False) ## not interested for the moment
 ```
+
 
 ```python
-process.onia2MuMuPAT.muons=cms.InputTag('oniaSelectedMuons')
+process.DiMuonCounter = cms.EDFilter('CandViewCountFilter',
+    src       = cms.InputTag("Onia2MuMuFiltered"),
+    minNumber = cms.uint32(1),
+)
 ```
+
 
 ```python
-process.onia2MuMuPAT.dimuonSelection=cms.string("2.5 < mass && mass < 3.5")
+
+process.OniaPseudoTrackTrackCandidateProducer = cms.EDProducer('OniaPseudoTrackTrackProducer',
+    Onia = cms.InputTag("Onia2MuMuFiltered"),
+    BeamSpot = cms.InputTag('offlineBeamSpot'),
+    Track = cms.InputTag("packedPFCandidates"),
+    OniaMassCuts = cms.vdouble(2.9,3.3), 
+    CandidateMassCuts = cms.vdouble(4.0,6.0),
+    Track1Mass = cms.double(0.493677),#kaons
+    Track2Mass = cms.double(0.493677),#kaons
+    ConstraintMass = cms.double(3.096916),#J/Psi
+)
+
 ```
-
-
 
 ## The Notebook
 
