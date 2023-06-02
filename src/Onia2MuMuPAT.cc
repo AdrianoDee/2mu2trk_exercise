@@ -1,4 +1,4 @@
-#include "Ponia/Onia/interface/Onia2MuMuPAT.h"
+#include "MuMuTrkTrk/MuMuTrkTrk/interface/Onia2MuMuPAT.h"
 //#include "HeavyFlavorAnalysis/Onia2MuMu/interface/Onia2MuMuPAT.h"
 
 //Headers for the data items
@@ -19,7 +19,7 @@
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TVector3.h"
-#include "Ponia/Onia/interface/OniaVtxReProducer.h"
+#include "MuMuTrkTrk/MuMuTrkTrk/interface/OniaVtxReProducer.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
