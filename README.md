@@ -49,6 +49,111 @@ The $J/psi$ and the $\phi$ then furhterly decay into a pair of opposite sign muo
 
 ## The Analyzer
 
+The analyzer chain steps run as follows (all the producer mentioned are under `MuMuTrkTrk/MuMuTrkTrk/(src|interface)`):
+1. the `Onia2MuMuPAT` `EDProducer` looping on all the suitable muons (`pat::Muons`) build dimuon candidates compatible with a $J/\psi$.
+2. the `OniaPseudoTrackTrackProducer` `EDProducer` gets the dimuon candidates produced above and try to attach to it two tracks compatible with two kaons coming from a $\phi$.
+3. the `OniaRecoTrackTrackRootupler` `EDProducer` gets the parameters and the observables from the candidate produced and fill a `TTree` in a `ROOT` file. 
+
+----
+
+The `Onia2MuMuPAT` producer here is basically a copy of what you already find in the release (under `HeavyFlavorAnalysis/Onia2MuMu/` package) with the addition of few extra variables.
+
+It takes in input a collection of `pat::Muons`
+
+```cpp
+  muons_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons")))
+```
+
+loops on them avoiding double counting
+
+```cpp
+//int intMuon = 0;
+  // JPsi candidates only from muons
+  for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
+    // both must pass low quality
+    if(!lowerPuritySelection_(*it)) continue;
+    for(View<pat::Muon>::const_iterator it2 = it+1; it2 != itend;++it2){
+      // both must pass low quality
+      if(!lowerPuritySelection_(*it2)) continue;
+...
+```
+
+builds a µµ candidate from their 4-momenta
+
+```cpp
+pat::CompositeCandidate myCand;
+vector<TransientVertex> pvs;
+
+// ---- no explicit order defined ----
+myCand.addDaughter(*it, "muon1");
+myCand.addDaughter(*it2,"muon2");
+
+// ---- define and set candidate's 4momentum  ----
+LorentzVector jpsi = it->p4() + it2->p4();
+myCand.setP4(jpsi);
+myCand.setCharge(it->charge()+it2->charge());
+
+```
+
+and try to make a vertex fit with their embedded tracks (if not available the candidate is not stored):
+
+```cpp
+
+// ---- fit vertex using Tracker tracks (if they have tracks) ----
+if (it->track().isNonnull() && it2->track().isNonnull()) {
+
+//build the dimuon secondary vertex
+vector<TransientTrack> t_tks;
+t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
+t_tks.push_back(theTTBuilder->build(*it2->track())); // otherwise the vertex will have transient refs inside.
+TransientVertex myVertex = vtxFitter.vertex(t_tks);
+
+CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
+```
+Note that to run the vertex fitt you need to build a `reco::TransientTrack` with the `theTTBuilder`. The transient tracks keep extra information (such as magnetic field, geometry) not accessible to standard `reco::Track`s.
+
+
+----
+
+The `OniaRecoTrackTrackRootupler` producer takes the `pat::CompositeCandidate` µµ candidates built from the previous step and tries to attach two additional tracks. As a first step we run a preselection of the `pat::PackedCandidateCollection`
+
+```cpp
+
+if (Tracks.isValid() && !Tracks->empty()) {
+    for (std::vector<pat::PackedCandidate>::const_iterator pp = Tracks->begin(); pp!= Tracks->end(); ++pp) {
+
+    if (!pp->trackHighPurity() || !pp->hasTrackDetails()) continue;
+    //Not all the packed candidates have a track attached, we check it. And additionaly we want an higPurityTrack
+
+    //if(!pp->fromPV()) continue; //Here we are asking if the embedded track comes from a PV
+
+    //if(pp->vertexRef().key()!=THEKEY) continue;  //here we can ask if the track comes from a specific PV (where THEKEY is the index of the vertex we are interested in in the PV collection)
+
+    //std::cout<<" ######### I have kaons for you ######### "<<std::endl;
+    const reco::Track* TheTrack = &pp->pseudoTrack();
+
+    //if (TheTrack->pt()<0.5 || std::abs(TheTrack->eta())>2.5) continue;
+    //Some custom selection
+
+    if (TheTrack->charge()==0) continue;
+
+    //std::cout<<" ######### K charge is not ZERO ######### "<<std::endl;
+    if ( IsTheSame(*TheTrack,*pmu1) || IsTheSame(*TheTrack,*pmu2) ) continue;
+    //std::cout<<" ######### Kaons does not match with Muons ######### "<<std::endl;
+
+    kaons.push_back(*TheTrack);
+    kaonsPV.push_back(pp->fromPV());
+    refVtx.push_back(pp->vertexRef().key());
+    pvAssocQ.push_back(pp->pvAssociationQuality());
+    dzAssocPV.push_back(pp->dzAssociatedPV());
+
+    [...]
+    
+    }
+}
+```
+
+
 ## The Config
 
 We select the global tag suitable for the dataset we have
@@ -117,10 +222,10 @@ process.load("MuMuTrkTrk.MuMuTrkTrk.onia2MuMuPAT_cfi")
 process.onia2MuMuPAT.muons=cms.InputTag('oniaSelectedMuons') #using as input the selected muons
 process.onia2MuMuPAT.primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices') #the PVs
 process.onia2MuMuPAT.beamSpotTag=cms.InputTag('offlineBeamSpot') #the Bs
-process.onia2MuMuPAT.higherPuritySelection=cms.string("") 
-process.onia2MuMuPAT.lowerPuritySelection=cms.string("")
+process.onia2MuMuPAT.higherPuritySelection=cms.string("") ## BOTH muons must pass this selection
+process.onia2MuMuPAT.lowerPuritySelection=cms.string("") ## At least one muon must pass this selection
 process.onia2MuMuPAT.dimuonSelection=cms.string("2.5 < mass && mass < 3.5") #mass window cuts
-process.onia2MuMuPAT.addMCTruth = cms.bool(False) ## not interested for the moment
+process.onia2MuMuPAT.addMCTruth = cms.bool(False) ## Not interested for the moment
 ```
 Then we filter the vents based on the number of µµ candidate we find (at least 1), just to avoid to continue the process when there's none
 

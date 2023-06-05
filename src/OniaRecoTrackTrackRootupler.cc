@@ -86,9 +86,9 @@ class OniaRecoTrackTrackRootupler : public edm::one::EDAnalyzer<> {
   TLorentzVector track1;
   TLorentzVector track2;
 
-  TLorentzVector ups_p4, muonP_p4, muonN_p4;
-  Double_t ups_vMass, ups_vertexWeight, ups_vProb, ups_vChi2, ups_DCA, ups_ctauPV, ups_ctauErrPV, ups_cosAlpha;
-  Double_t ups_lxyPV, ups_lxyErrPV, ups_ctauBS, ups_ctauErrBS, ups_lxyBS, ups_lxyErrBS;
+  TLorentzVector mumu_p4, muonP_p4, muonN_p4;
+  Double_t mumu_vMass, mumu_vertexWeight, mumu_vProb, mumu_vChi2, mumu_DCA, mumu_ctauPV, mumu_ctauErrPV, mumu_cosAlpha;
+  Double_t mumu_lxyPV, mumu_lxyErrPV, mumu_ctauBS, mumu_ctauErrBS, mumu_lxyBS, mumu_lxyErrBS;
   Double_t mu1_pt, mu1_ptErr, mu1_d0, mu1_d0Err, mu1_dz, mu1_dzErr, mu1_dxy, mu1_dxyErr, mu2_pt, mu2_ptErr, mu2_d0, mu2_d0Err, mu2_dz, mu2_dzErr, mu2_dxy, mu2_dxyErr;
   Int_t mu1_nvsh, mu1_nvph, mu2_nvsh, mu2_nvph, iPVwithmuons_ups, mu1_charge, mu2_charge;
 
@@ -102,7 +102,7 @@ static const Double_t ups2SMass = 10.02326;
 
 OniaRecoTrackTrackRootupler::OniaRecoTrackTrackRootupler(const edm::ParameterSet& iConfig):
 TheCandidateLabel(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("TheCandidates"))),
-TheUpsLabel(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("TheUps"))),
+TheUpsLabel(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("MuMuCands"))),
 ThePrimaryVertexLabel(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("PrimaryVertices"))),
 TheTriggerResultLabel(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 TheGenParticleLabel(consumes<reco::GenParticleCollection>(iConfig.getParameter < edm::InputTag > ("GenParticles"))),
@@ -229,26 +229,26 @@ OnlyBest_(iConfig.getParameter<bool>("OnlyBest"))
         UpsTree->Branch("event",              &event,              "event/I");
         UpsTree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/I");
         UpsTree->Branch("trigger",            &trigger,            "trigger/I");
-        UpsTree->Branch("ups_p4",   "TLorentzVector", &ups_p4);
+        UpsTree->Branch("mumu_p4",   "TLorentzVector", &mumu_p4);
         UpsTree->Branch("muonP_p4",    "TLorentzVector", &muonP_p4);
         UpsTree->Branch("muonN_p4",    "TLorentzVector", &muonN_p4);
 
         UpsTree->Branch("iPVwithmuons_ups",        &iPVwithmuons_ups,        "iPVwithmuons_ups/I");
 
-        UpsTree->Branch("ups_vertexWeight",        &ups_vertexWeight,        "ups_vertexWeight/D");
-        UpsTree->Branch("ups_vProb",        &ups_vProb,        "ups_vProb/D");
-        UpsTree->Branch("ups_vMass",        &ups_vMass,        "ups_vMass/D");
-        UpsTree->Branch("ups_vNChi2",       &ups_vChi2,        "ups_vNChi2/D");
-        UpsTree->Branch("ups_DCA",          &ups_DCA,          "ups_DCA/D");
-        UpsTree->Branch("ups_ctauPV",       &ups_ctauPV,       "ups_ctauPV/D");
-        UpsTree->Branch("ups_ctauErrPV",    &ups_ctauErrPV,    "ups_ctauErrPV/D");
-        UpsTree->Branch("ups_lxyPV",        &ups_lxyPV,          "ups_lxyPV/D");
-        UpsTree->Branch("ups_lxyErrPV",     &ups_lxyErrPV,       "ups_lxyErrPV/D");
-        UpsTree->Branch("ups_cosAlpha",     &ups_cosAlpha,     "ups_cosAlpha/D");
-        UpsTree->Branch("ups_ctauBS",       &ups_ctauBS,       "ups_ctauBS/D");
-        UpsTree->Branch("ups_ctauErrBS",    &ups_ctauErrBS,    "ups_ctauErrBS/D");
-        UpsTree->Branch("ups_lxyBS",        &ups_lxyBS,          "ups_lxyBS/D");
-        UpsTree->Branch("ups_lxyErrBS",     &ups_lxyErrBS,       "ups_lxyErrBS/D");
+        UpsTree->Branch("mumu_vertexWeight",        &mumu_vertexWeight,        "mumu_vertexWeight/D");
+        UpsTree->Branch("mumu_vProb",        &mumu_vProb,        "mumu_vProb/D");
+        UpsTree->Branch("mumu_vMass",        &mumu_vMass,        "mumu_vMass/D");
+        UpsTree->Branch("mumu_vNChi2",       &mumu_vChi2,        "mumu_vNChi2/D");
+        UpsTree->Branch("mumu_DCA",          &mumu_DCA,          "mumu_DCA/D");
+        UpsTree->Branch("mumu_ctauPV",       &mumu_ctauPV,       "mumu_ctauPV/D");
+        UpsTree->Branch("mumu_ctauErrPV",    &mumu_ctauErrPV,    "mumu_ctauErrPV/D");
+        UpsTree->Branch("mumu_lxyPV",        &mumu_lxyPV,          "mumu_lxyPV/D");
+        UpsTree->Branch("mumu_lxyErrPV",     &mumu_lxyErrPV,       "mumu_lxyErrPV/D");
+        UpsTree->Branch("mumu_cosAlpha",     &mumu_cosAlpha,     "mumu_cosAlpha/D");
+        UpsTree->Branch("mumu_ctauBS",       &mumu_ctauBS,       "mumu_ctauBS/D");
+        UpsTree->Branch("mumu_ctauErrBS",    &mumu_ctauErrBS,    "mumu_ctauErrBS/D");
+        UpsTree->Branch("mumu_lxyBS",        &mumu_lxyBS,          "mumu_lxyBS/D");
+        UpsTree->Branch("mumu_lxyErrBS",     &mumu_lxyErrBS,       "mumu_lxyErrBS/D");
 
         UpsTree->Branch("mu1_pt",    &mu1_pt,    "mu1_pt/D");
         UpsTree->Branch("mu1_ptErr",    &mu1_ptErr,    "mu1_ptErr/D");
@@ -282,8 +282,8 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
   edm::Handle < pat::CompositeCandidateCollection >TheCandidates;
   iEvent.getByToken(TheCandidateLabel, TheCandidates);
 
-  edm::Handle < pat::CompositeCandidateCollection >TheUps;
-  iEvent.getByToken(TheUpsLabel, TheUps);
+  edm::Handle < pat::CompositeCandidateCollection >MuMuCands;
+  iEvent.getByToken(TheUpsLabel, MuMuCands);
 
   edm::Handle < reco::VertexCollection  >ThePrimaryVertices;
   iEvent.getByToken(ThePrimaryVertexLabel, ThePrimaryVertices);
@@ -301,14 +301,13 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
     edm::Handle<reco::GenParticleCollection> GenParticles;
     iEvent.getByToken(TheGenParticleLabel, GenParticles);
     int foundit = 0;
-    //int gen_track1_pdgid_ = 0;
-    //int gen_track2_pdgid_ = 0;
+
     gen_candidate_pdgId = 0;
     if (GenParticles.isValid() ) {
       for ( reco::GenParticleCollection::const_iterator itParticle = GenParticles->begin(); itParticle != GenParticles->end(); ++itParticle ) {
         int pdgId = itParticle->pdgId();
         if ( abs(pdgId) ==  candidate_pdgid_ ) {
-          //const reco::Candidate* gen_y2s = itParticle
+
           gen_candidate_charge = itParticle->charge();
           gen_candidate_p4.SetPtEtaPhiM(itParticle->pt(),itParticle->eta(),itParticle->phi(),itParticle->mass());
           gen_candidate_pdgId = pdgId;
@@ -341,17 +340,11 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
               for (uint k = 0; k < b->numberOfDaughters(); ++k) {
                 const reco::Candidate* p = b->daughter(k);
                 if ( p->pdgId() == track1_pdgid_ && p->status() == 1 ) {
-                   //std::cout<<" in dipion - pion 1 "<<std::endl;
-                   //track1.SetPtEtaPhiM(p->pt(),p->eta(),p->phi(),p->mass());
-                   //gen_track1_pdgid_ = track1_pdgid_;
                    gen_track1_p4.SetPtEtaPhiM(p->pt(),p->eta(),p->phi(),p->mass());
                    gen_track1_pdgid = track1_pdgid_;
                    foundit++;
                 }
                 if ( p->pdgId() == track2_pdgid_ && p->status() == 1 ) {
-                   //std::cout<<" in dipion - pion 2 "<<std::endl;
-                   //track2.SetPtEtaPhiM(p->pt(),p->eta(),p->phi(),p->mass());
-                   //gen_track2_pdgid_ = track2_pdgid_;
                    gen_track2_p4.SetPtEtaPhiM(p->pt(),p->eta(),p->phi(),p->mass());
                    gen_track2_pdgid = track2_pdgid_;
                    foundit++;
@@ -359,17 +352,11 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
               }
             } else {
               if ( bpdgid == track1_pdgid_ && b->status() == 1 ) {
-                //std::cout<<" pion 1 "<<std::endl;
-                //track1.SetPtEtaPhiM(b->pt(),b->eta(),b->phi(),b->mass());
-                //gen_track1_pdgid_ = track1_pdgid_;
                 gen_track1_p4.SetPtEtaPhiM(b->pt(),b->eta(),b->phi(),b->mass());
                 gen_track1_pdgid = track1_pdgid_;
                 foundit++;
               }
               if ( bpdgid == track2_pdgid_ && b->status() == 1 ) {
-                //std::cout<<" pion 2 "<<std::endl;
-                //track2.SetPtEtaPhiM(b->pt(),b->eta(),b->phi(),b->mass());
-                //gen_track2_pdgid_ = track2_pdgid_;
                 gen_track2_p4.SetPtEtaPhiM(b->pt(),b->eta(),b->phi(),b->mass());
                 gen_track2_pdgid = track2_pdgid_;
                 foundit++;
@@ -390,17 +377,13 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
    trigger = 0;
    if (triggerResults_handle.isValid()) {
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
-      unsigned int NTRIGGERS = 10;
+      unsigned int NTRIGGERS = 1;
       std::string TriggersToTest[NTRIGGERS] = {
-        "HLT_Dimuon20_Jpsi_Barrel_Seagulls","HLT_Dimuon25_Jpsi",
-        "HLT_Dimuon10_PsiPrime_Barrel_Seagulls","HLT_Dimuon18_PsiPrime",
-        "HLT_Dimuon10_Upsilon_Barrel_Seagulls","HLT_Dimuon12_Upsilon_eta1p5",
-        "HLT_Dimuon14_Phi_Barrel_Seagulls","HLT_Dimuon12_Upsilon_y1p4",
-        "HLT_Dimuon8_Upsilon_Barrel","HLT_Dimuon13_Upsilon"
+        "HLT_DoubleMu4_JpsiTrkTrk_Displaced"
       };
 
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
-         for (int version = 1; version < 19; version++) {
+         for (int version = 1; version < 20; version++) {
             std::stringstream ss;
             ss << TriggersToTest[i] << "_v" << version;
             unsigned int bit = TheTriggerNames.triggerIndex(edm::InputTag(ss.str()).label());
@@ -494,8 +477,6 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
       track2_nvph    = TheTrack2_->hitPattern().numberOfValidPixelHits();
       track2_charge  = TheTrack2_->charge();
 
-      // iPVwithmuons = TheDimuon_->userInt("iPV");
-
       dimuon_vertexWeight = TheDimuon_->userFloat("vertexWeight");
       dimuon_vProb        = TheDimuon_->userFloat("vProb");
       dimuon_vChi2        = TheDimuon_->userFloat("vNChi2");
@@ -523,34 +504,34 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
     }
   } else std::cout<< "No candidate information " << run << "," << event <<std::endl;
 
-  if (TheUps.isValid() && !TheUps->empty()) {
-    pat::CompositeCandidate TheUps_;
-    for (unsigned int i=0; i< TheUps->size(); i++){
-      TheUps_       = TheUps->at(i);
+  if (MuMuCands.isValid() && !MuMuCands->empty()) {
+    pat::CompositeCandidate MuMu;
+    for (unsigned int i=0; i< MuMuCands->size(); i++){
+      MuMu       = MuMuCands->at(i);
 
-      ups_p4.SetPtEtaPhiM(TheUps_.pt(),TheUps_.eta(),TheUps_.phi(),TheUps_.mass());
+      mumu_p4.SetPtEtaPhiM(MuMu.pt(),MuMu.eta(),MuMu.phi(),MuMu.mass());
 
-      ups_vertexWeight = TheUps_.userFloat("vertexWeight");
-      ups_vProb        = TheUps_.userFloat("vProb");
-      ups_vMass        = TheUps_.userFloat("vMass");
-      ups_vChi2        = TheUps_.userFloat("vNChi2");
-      ups_DCA          = TheUps_.userFloat("DCA");
-      ups_ctauPV       = TheUps_.userFloat("ppdlPV");
-      ups_ctauErrPV    = TheUps_.userFloat("ppdlErrPV");
-      ups_cosAlpha     = TheUps_.userFloat("cosAlpha");
+      mumu_vertexWeight = MuMu.userFloat("vertexWeight");
+      mumu_vProb        = MuMu.userFloat("vProb");
+      mumu_vMass        = MuMu.userFloat("vMass");
+      mumu_vChi2        = MuMu.userFloat("vNChi2");
+      mumu_DCA          = MuMu.userFloat("DCA");
+      mumu_ctauPV       = MuMu.userFloat("ppdlPV");
+      mumu_ctauErrPV    = MuMu.userFloat("ppdlErrPV");
+      mumu_cosAlpha     = MuMu.userFloat("cosAlpha");
 
-      ups_lxyPV        = TheUps_.userFloat("lxyPV");
-      ups_lxyErrPV     = TheUps_.userFloat("lxyErrPV");
-      ups_ctauBS       = TheUps_.userFloat("ppdlBS");
-      ups_ctauErrBS    = TheUps_.userFloat("ppdlErrBS");
-      ups_lxyBS        = TheUps_.userFloat("lxyBS");
-      ups_lxyErrBS     = TheUps_.userFloat("lxyErrBS");
+      mumu_lxyPV        = MuMu.userFloat("lxyPV");
+      mumu_lxyErrPV     = MuMu.userFloat("lxyErrPV");
+      mumu_ctauBS       = MuMu.userFloat("ppdlBS");
+      mumu_ctauErrBS    = MuMu.userFloat("ppdlErrBS");
+      mumu_lxyBS        = MuMu.userFloat("lxyBS");
+      mumu_lxyErrBS     = MuMu.userFloat("lxyErrBS");
 
-      // iPVwithmuons_ups = TheUps_.userInt("iPV");
+      // iPVwithmuons_ups = MuMu.userInt("iPV");
 
-      const reco::Candidate::LorentzVector muP = TheUps_.daughter("muon1")->p4();
-      const reco::Candidate::LorentzVector muM = TheUps_.daughter("muon2")->p4();
-      if (TheUps_.daughter("muon1")->charge() > 0) {
+      const reco::Candidate::LorentzVector muP = MuMu.daughter("muon1")->p4();
+      const reco::Candidate::LorentzVector muM = MuMu.daughter("muon2")->p4();
+      if (MuMu.daughter("muon1")->charge() > 0) {
          muonP_p4.SetPtEtaPhiM(muP.pt(), muP.eta(), muP.phi(), muP.mass());
          muonN_p4.SetPtEtaPhiM(muM.pt(), muM.eta(), muM.phi(), muM.mass());
       } else {
@@ -559,56 +540,56 @@ void OniaRecoTrackTrackRootupler::analyze(const edm::Event& iEvent, const edm::E
       }
 
       //double testPt1 = 0.;
-      if (TheUps_.userInt("mu1_charge") > 0) {
-        //testPt1 = TheUps_.userFloat("mu1_pt");
-        mu1_pt      = TheUps_.userFloat("mu1_pt");
-        mu1_ptErr   = TheUps_.userFloat("mu1_ptErr");
-        mu1_d0      = TheUps_.userFloat("mu1_d0");
-        mu1_d0Err   = TheUps_.userFloat("mu1_d0Err");
-        mu1_dz      = TheUps_.userFloat("mu1_dz");
-        mu1_dzErr   = TheUps_.userFloat("mu1_dzErr");
-        mu1_dxy     = TheUps_.userFloat("mu1_dxy");
-        mu1_dxyErr  = TheUps_.userFloat("mu1_dxyErr");
-        mu1_nvsh    = TheUps_.userInt("mu1_nvsh");
-        mu1_nvph    = TheUps_.userInt("mu1_nvph");
-        mu1_charge  = TheUps_.userInt("mu1_charge");
+      if (MuMu.userInt("mu1_charge") > 0) {
+        //testPt1 = MuMu.userFloat("mu1_pt");
+        mu1_pt      = MuMu.userFloat("mu1_pt");
+        mu1_ptErr   = MuMu.userFloat("mu1_ptErr");
+        mu1_d0      = MuMu.userFloat("mu1_d0");
+        mu1_d0Err   = MuMu.userFloat("mu1_d0Err");
+        mu1_dz      = MuMu.userFloat("mu1_dz");
+        mu1_dzErr   = MuMu.userFloat("mu1_dzErr");
+        mu1_dxy     = MuMu.userFloat("mu1_dxy");
+        mu1_dxyErr  = MuMu.userFloat("mu1_dxyErr");
+        mu1_nvsh    = MuMu.userInt("mu1_nvsh");
+        mu1_nvph    = MuMu.userInt("mu1_nvph");
+        mu1_charge  = MuMu.userInt("mu1_charge");
 
-        mu2_pt      = TheUps_.userFloat("mu2_pt");
-        mu2_ptErr   = TheUps_.userFloat("mu2_ptErr");
-        mu2_d0      = TheUps_.userFloat("mu2_d0");
-        mu2_d0Err   = TheUps_.userFloat("mu2_d0Err");
-        mu2_dz      = TheUps_.userFloat("mu2_dz");
-        mu2_dzErr   = TheUps_.userFloat("mu2_dzErr");
-        mu2_dxy     = TheUps_.userFloat("mu2_dxy");
-        mu2_dxyErr  = TheUps_.userFloat("mu2_dxyErr");
-        mu2_nvsh    = TheUps_.userInt("mu2_nvsh");
-        mu2_nvph    = TheUps_.userInt("mu2_nvph");
-        mu2_charge  = TheUps_.userInt("mu2_charge");
+        mu2_pt      = MuMu.userFloat("mu2_pt");
+        mu2_ptErr   = MuMu.userFloat("mu2_ptErr");
+        mu2_d0      = MuMu.userFloat("mu2_d0");
+        mu2_d0Err   = MuMu.userFloat("mu2_d0Err");
+        mu2_dz      = MuMu.userFloat("mu2_dz");
+        mu2_dzErr   = MuMu.userFloat("mu2_dzErr");
+        mu2_dxy     = MuMu.userFloat("mu2_dxy");
+        mu2_dxyErr  = MuMu.userFloat("mu2_dxyErr");
+        mu2_nvsh    = MuMu.userInt("mu2_nvsh");
+        mu2_nvph    = MuMu.userInt("mu2_nvph");
+        mu2_charge  = MuMu.userInt("mu2_charge");
       } else {
-        //testPt1 = TheUps_.userFloat("mu2_pt");
-        mu1_pt      = TheUps_.userFloat("mu2_pt");
-        mu1_ptErr   = TheUps_.userFloat("mu2_ptErr");
-        mu1_d0      = TheUps_.userFloat("mu2_d0");
-        mu1_d0Err   = TheUps_.userFloat("mu2_d0Err");
-        mu1_dz      = TheUps_.userFloat("mu2_dz");
-        mu1_dzErr   = TheUps_.userFloat("mu2_dzErr");
-        mu1_dxy     = TheUps_.userFloat("mu2_dxy");
-        mu1_dxyErr  = TheUps_.userFloat("mu2_dxyErr");
-        mu1_nvsh    = TheUps_.userInt("mu2_nvsh");
-        mu1_nvph    = TheUps_.userInt("mu2_nvph");
-        mu1_charge  = TheUps_.userInt("mu2_charge");
+        //testPt1 = MuMu.userFloat("mu2_pt");
+        mu1_pt      = MuMu.userFloat("mu2_pt");
+        mu1_ptErr   = MuMu.userFloat("mu2_ptErr");
+        mu1_d0      = MuMu.userFloat("mu2_d0");
+        mu1_d0Err   = MuMu.userFloat("mu2_d0Err");
+        mu1_dz      = MuMu.userFloat("mu2_dz");
+        mu1_dzErr   = MuMu.userFloat("mu2_dzErr");
+        mu1_dxy     = MuMu.userFloat("mu2_dxy");
+        mu1_dxyErr  = MuMu.userFloat("mu2_dxyErr");
+        mu1_nvsh    = MuMu.userInt("mu2_nvsh");
+        mu1_nvph    = MuMu.userInt("mu2_nvph");
+        mu1_charge  = MuMu.userInt("mu2_charge");
 
-        mu2_pt      = TheUps_.userFloat("mu1_pt");
-        mu2_ptErr   = TheUps_.userFloat("mu1_ptErr");
-        mu2_d0      = TheUps_.userFloat("mu1_d0");
-        mu2_d0Err   = TheUps_.userFloat("mu1_d0Err");
-        mu2_dz      = TheUps_.userFloat("mu1_dz");
-        mu2_dzErr   = TheUps_.userFloat("mu1_dzErr");
-        mu2_dxy     = TheUps_.userFloat("mu1_dxy");
-        mu2_dxyErr  = TheUps_.userFloat("mu1_dxyErr");
-        mu2_nvsh    = TheUps_.userInt("mu1_nvsh");
-        mu2_nvph    = TheUps_.userInt("mu1_nvph");
-        mu2_charge  = TheUps_.userInt("mu1_charge");
+        mu2_pt      = MuMu.userFloat("mu1_pt");
+        mu2_ptErr   = MuMu.userFloat("mu1_ptErr");
+        mu2_d0      = MuMu.userFloat("mu1_d0");
+        mu2_d0Err   = MuMu.userFloat("mu1_d0Err");
+        mu2_dz      = MuMu.userFloat("mu1_dz");
+        mu2_dzErr   = MuMu.userFloat("mu1_dzErr");
+        mu2_dxy     = MuMu.userFloat("mu1_dxy");
+        mu2_dxyErr  = MuMu.userFloat("mu1_dxyErr");
+        mu2_nvsh    = MuMu.userInt("mu1_nvsh");
+        mu2_nvph    = MuMu.userInt("mu1_nvph");
+        mu2_charge  = MuMu.userInt("mu1_charge");
       }
 
       //std::cout<<" ===> pt = "<<muonP_p4.Pt()<<" single one = "<<testPt1<<std::endl;

@@ -109,7 +109,7 @@ process.jpsitrktrkSequence = cms.Sequence(
 ### rootuple chain
 process.rootuple = cms.EDAnalyzer('OniaRecoTrackTrackRootupler',
                           TheCandidates = cms.InputTag("OniaPseudoTrackTrackCandidateProducer"),
-                          TheUps = cms.InputTag("Onia2MuMuFiltered"),
+                          MuMuCands = cms.InputTag("Onia2MuMuFiltered"),
                           PrimaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults = cms.InputTag("TriggerResults", "", "HLT"),
                           GenParticles = cms.InputTag("prunedGenParticles"),

@@ -78,9 +78,13 @@ void OniaPseudoTrackTrackProducer::produce(edm::Event& event, const edm::EventSe
 
            if (!pp->trackHighPurity() || !pp->hasTrackDetails()) continue;
 
-           // if(!pp->fromPV()) continue;
-           //if ( pp->vertexRef().key()!=THEKEY) continue; //This reinforce the fromPV request above
-
+           //if(!pp->fromPV()) continue; 
+           //Here we are asking if the embedded track comes from a PV
+    
+           //if(pp->vertexRef().key()!=THEKEY) continue;  
+           // here we can ask if the track comes from a specific PV 
+           // (where THEKEY is the index of the vertex we are interested in in the PV collection)
+           
            //std::cout<<" ######### I have kaons for you ######### "<<std::endl;
            const reco::Track* TheTrack = &pp->pseudoTrack();
 
@@ -226,7 +230,6 @@ void OniaPseudoTrackTrackProducer::produce(edm::Event& event, const edm::EventSe
             vDiff3D[0] = vdiff3D.x(); vDiff3D[1] = vdiff3D.y(); vDiff3D[2] = vdiff3D.z(); // needed by Similarity method
             float lxyzErr = sqrt(ROOT::Math::Similarity(vDiff3D,vXYe)) / vdiff3D.Mag();
 
-            TheCandidate.addUserInt("vStatus",1);
             TheCandidate.addUserFloat("vProb",Prob);
             TheCandidate.addUserFloat("cosAlpha",cosAlpha);
             TheCandidate.addUserFloat("cosAlpha3D",cosAlpha3D);
