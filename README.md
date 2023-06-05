@@ -148,11 +148,83 @@ if (Tracks.isValid() && !Tracks->empty()) {
     dzAssocPV.push_back(pp->dzAssociatedPV());
 
     [...]
-    
+
     }
 }
 ```
 
+Note that not all the selections are turned on (some are commented). Then we loop on the selcted "kaons" (skipping double counting):
+
+```cpp
+for (unsigned int ii=0; ii<kaons.size();++ii) {
+         reco::Track* Track1 = &kaons.at(ii);
+         for (unsigned int jj=ii+1; jj<kaons.size();++jj) {
+            reco::Track* Track2 = &kaons.at(jj);
+            if (Track1 == Track2) continue;
+```
+
+The selection here:
+
+```cpp
+
+ //if(Track1->charge() * Track2->charge() >= 0) continue; // Right sign
+//if(Track1->charge() * Track2->charge() <= 0) continue; // Wrong sign
+
+```
+
+is commented to keep both Right Sign (RS,charge==0) and Wrong Sign (WS,|charge|=2) combinations. WS is often useful to mimic the combinatorial background.
+
+The final µµKK candidate is built by fitting togheter the four tracks (two from the muons and two from the packed PF candidates). We need again `reco::TransientTrack`:
+
+```cpp
+std::vector<reco::TransientTrack> MuMuTk;
+MuMuTk.push_back(theB.build(*pmu1->innerTrack()));
+MuMuTk.push_back(theB.build(*pmu2->innerTrack()));
+MuMuTk.push_back(theB.build(*Track1));
+MuMuTk.push_back(theB.build(*Track2));
+```
+
+Then to run a kinematic fit (i.e. a fit "aware" of the track masses and the possible mass constraints), we need to transform the tracks into "particles" with masses with a `KinematicParticleFactoryFromTransientTrack` object
+
+```cpp
+KinematicParticleFactoryFromTransientTrack pFactory;
+const ParticleMass muMass(0.1056583);
+float muSigma = muMass*1E-6;
+const ParticleMass tk1Mass(Track1Mass_); ##Kaon mass Hypothesis: remember in CMS we have no PID!
+float tk1Sigma = tk1Mass*1E-6;
+const ParticleMass tk2Mass(Track2Mass_);
+float tk2Sigma = tk2Mass*1E-6;
+```
+
+Then, mostly to improve the resolution, we apply a mass constraint to the µµ candidate, forcing the mass to be that of the $J/\psi$:
+
+```cpp
+ParticleMass mass_(ConstraintMass_);
+std::vector<RefCountedKinematicParticle> allDaughters_;
+allDaughters_.push_back(pFactory.particle (MuMuTk[0], muMass, float(0), float(0), muSigma));
+allDaughters_.push_back(pFactory.particle (MuMuTk[1], muMass, float(0), float(0), muSigma));
+allDaughters_.push_back(pFactory.particle (MuMuTk[2], tk1Mass, float(0), float(0), tk1Sigma));
+allDaughters_.push_back(pFactory.particle (MuMuTk[3], tk2Mass, float(0), float(0), tk2Sigma));
+```
+note that in this context the order is important since the constraint is placed on the first two particles (the two µ) with a `TwoTrackMassKinematicConstraint` object:
+
+```cpp
+KinematicConstrainedVertexFitter constVertexFitter;
+MultiTrackKinematicConstraint *onia_mtc = new  TwoTrackMassKinematicConstraint(mass_);
+RefCountedKinematicTree TheParticleTree = constVertexFitter.fit(allDaughters_,onia_mtc);
+```
+The result of the fit is a `RefCountedKinematicTree` that has all the decay products stored in a tree we may navigate from top to bottom:
+
+```cpp
+TheParticleTree->movePointerToTheTop();
+RefCountedKinematicParticle TheParticle = TheParticleTree->currentParticle();
+RefCountedKinematicVertex TheDecayVertex = TheParticleTree->currentDecayVertex();
+```
+accessing the next particle with (even if we don't use it in the analyzer itself):
+```cpp
+TheParticleTree->movePointerToTheNextChild()
+RefCountedKinematicParticle nextDaughter = TheParticleTree->currentParticle();
+```
 
 ## The Config
 
