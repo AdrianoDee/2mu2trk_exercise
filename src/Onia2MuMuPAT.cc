@@ -52,9 +52,6 @@ Onia2MuMuPAT::Onia2MuMuPAT(const edm::ParameterSet& iConfig):
 Onia2MuMuPAT::~Onia2MuMuPAT()
 {
 
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
-
 }
 
 
@@ -81,10 +78,6 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
-
-  // ESHandle<MagneticField> magneticField;
-  // iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-  // const MagneticField* field = magneticField.product();
 
   edm::ESHandle<MagneticField> magneticField = iSetup.getHandle(theFieldToken_);
   const MagneticField* field = magneticField.product();
@@ -141,13 +134,13 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
 
-  //build the dimuon secondary vertex
-  vector<TransientTrack> t_tks;
-  t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
-  t_tks.push_back(theTTBuilder->build(*it2->track())); // otherwise the vertex will have transient refs inside.
-  TransientVertex myVertex = vtxFitter.vertex(t_tks);
+      //build the dimuon secondary vertex
+      vector<TransientTrack> t_tks;
+      t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
+      t_tks.push_back(theTTBuilder->build(*it2->track())); // otherwise the vertex will have transient refs inside.
+      TransientVertex myVertex = vtxFitter.vertex(t_tks);
 
-  CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
+      CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
 
         Measurement1D MassWErr(jpsi.M(),-9999.);
         if ( field->nominalValue() > 0 ) {
