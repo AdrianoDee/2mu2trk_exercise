@@ -109,7 +109,7 @@ In this case, e.g., we are selecting muons:
 - `pt > 2.`, etc...
 
 
-Now it's the moment to build the µµ candidate:
+Now it's the moment to build the µµ candidate. This is done through the `Onia2MuMuPAT` `EDProducer`
 
 ```python
 ### µµ building
@@ -122,7 +122,7 @@ process.onia2MuMuPAT.lowerPuritySelection=cms.string("")
 process.onia2MuMuPAT.dimuonSelection=cms.string("2.5 < mass && mass < 3.5") #mass window cuts
 process.onia2MuMuPAT.addMCTruth = cms.bool(False) ## not interested for the moment
 ```
-
+Then we filter the vents based on the number of µµ candidate we find (at least 1), just to avoid to continue the process when there's none
 
 ```python
 process.DiMuonCounter = cms.EDFilter('CandViewCountFilter',
@@ -131,20 +131,43 @@ process.DiMuonCounter = cms.EDFilter('CandViewCountFilter',
 )
 ```
 
+Finally the µµKK candidate is reconstructed.
 
 ```python
 
 process.OniaPseudoTrackTrackCandidateProducer = cms.EDProducer('OniaPseudoTrackTrackProducer',
     Onia = cms.InputTag("Onia2MuMuFiltered"),
     BeamSpot = cms.InputTag('offlineBeamSpot'),
-    Track = cms.InputTag("packedPFCandidates"),
-    OniaMassCuts = cms.vdouble(2.9,3.3), 
-    CandidateMassCuts = cms.vdouble(4.0,6.0),
-    Track1Mass = cms.double(0.493677),#kaons
-    Track2Mass = cms.double(0.493677),#kaons
-    ConstraintMass = cms.double(3.096916),#J/Psi
+    Track = cms.InputTag("packedPFCandidates"), 
+    OniaMassCuts = cms.vdouble(2.9,3.3), #J/Psi mass window, narrower than before
+    CandidateMassCuts = cms.vdouble(4.0,6.0), #µµKK mass window
+    Track1Mass = cms.double(0.493677),#kaon mass, for track refit hypothesis
+    Track2Mass = cms.double(0.493677),
+    ConstraintMass = cms.double(3.096916),#J/Psi mass constraint
 )
 
+```
+
+The final step consist in writing in a simple `ROOT` `TTree` the observable we are interested in with the `OniaRecoTrackTrackRootupler`.
+
+```python
+process.rootuple = cms.EDAnalyzer('OniaRecoTrackTrackRootupler',
+                          TheCandidates = cms.InputTag("OniaPseudoTrackTrackCandidateProducer"), # the µµKK candidates we have built
+                          TheUps = cms.InputTag("Onia2MuMuFiltered"),
+                          PrimaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                          TriggerResults = cms.InputTag("TriggerResults", "", "HLT"),
+                          GenParticles = cms.InputTag("prunedGenParticles"),
+                          Track1Mass = cms.double(0.493677),
+                          Track2Mass = cms.double(0.493677),
+                          DimuonMass = cms.double(3.096916),
+                          candidate_pdgid = cms.uint32(531),
+                          onia_pdgid = cms.uint32(443),
+                          ditrack_pdgid = cms.uint32(333),
+                          track1_pdgid = cms.int32(321),
+                          track2_pdgid = cms.int32(-321),
+                          isMC = cms.bool(True), 
+                          OnlyBest = cms.bool(False) #Selecting only the candidate with the best vertex probability
+)
 ```
 
 ## The Notebook
